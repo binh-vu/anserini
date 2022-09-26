@@ -27,6 +27,8 @@ import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.FloatPoint;
+import org.apache.lucene.document.FeatureField;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.util.BytesRef;
 
@@ -112,7 +114,9 @@ public class EnhancedLuceneDocumentGenerator<T extends SourceDocument> implement
           if (ArrayUtils.contains(args.fields, k)) {
             document.add(new Field(k, v, fieldType));
           } else if (ArrayUtils.contains(args.floatFields, k)) {
-            document.add(new StoredField(k, Float.parseFloat(v)));
+            document.add(new FloatPoint(k, Float.parseFloat(v)));
+          } else if (ArrayUtils.contains(args.featureFields, k)) {
+            document.add(new FeatureField("features", k, Float.parseFloat(v)));
           }
         }
       });

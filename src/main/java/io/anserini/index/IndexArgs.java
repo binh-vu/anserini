@@ -73,8 +73,11 @@ public class IndexArgs {
     @Option(name = "-fields", handler = StringArrayOptionHandler.class, usage = "List of fields to index (space separated), in addition to the default 'contents' field.")
     public String[] fields = new String[] {};
 
-    @Option(name = "-floatFields", handler = StringArrayOptionHandler.class, usage = "List of fields to index (space separated), in addition to the default 'contents' field.")
+    @Option(name = "-floatFields", handler = StringArrayOptionHandler.class, usage = "List of float fields to index (space separated), in addition to the default 'contents' field.")
     public String[] floatFields = new String[] {};
+
+    @Option(name = "-featureFields", handler = StringArrayOptionHandler.class, usage = "List of feature fields to index (space separated), in addition to the default 'contents' field.")
+    public String[] featureFields = new String[] {};
 
     @Option(name = "-storePositions", usage = "Boolean switch to index store term positions; needed for phrase queries.")
     public boolean storePositions = false;
