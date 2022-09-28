@@ -99,12 +99,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Class that exposes basic search functionality, designed specifically to provide the bridge between Java and Python
+ * Class that exposes basic search functionality, designed specifically to
+ * provide the bridge between Java and Python
  * via pyjnius.
  */
 public class SimpleSearcher implements Closeable {
-  public static final Sort BREAK_SCORE_TIES_BY_DOCID =
-      new Sort(SortField.FIELD_SCORE, new SortField(IndexArgs.ID, SortField.Type.STRING_VAL));
+  public static final Sort BREAK_SCORE_TIES_BY_DOCID = new Sort(SortField.FIELD_SCORE,
+      new SortField(IndexArgs.ID, SortField.Type.STRING_VAL));
   private static final Logger LOG = LogManager.getLogger(SimpleSearcher.class);
 
   public static final class Args {
@@ -117,19 +118,20 @@ public class SimpleSearcher implements Closeable {
     @Option(name = "-output", metaVar = "[file]", required = true, usage = "Output run file.")
     public String output;
 
-    @Option(name = "-bm25", usage = "Flag to use BM25.", forbids = {"-ql"})
+    @Option(name = "-bm25", usage = "Flag to use BM25.", forbids = { "-ql" })
     public Boolean useBM25 = true;
 
-    @Option(name = "-bm25.k1", usage = "BM25 k1 value.", forbids = {"-ql"})
+    @Option(name = "-bm25.k1", usage = "BM25 k1 value.", forbids = { "-ql" })
     public float bm25_k1 = 0.9f;
 
-    @Option(name = "-bm25.b", usage = "BM25 b value.", forbids = {"-ql"})
+    @Option(name = "-bm25.b", usage = "BM25 b value.", forbids = { "-ql" })
     public float bm25_b = 0.4f;
 
-    @Option(name = "-qld", usage = "Flag to use query-likelihood with Dirichlet smoothing.", forbids={"-bm25"})
+    @Option(name = "-qld", usage = "Flag to use query-likelihood with Dirichlet smoothing.", forbids = { "-bm25" })
     public Boolean useQL = false;
 
-    @Option(name = "-qld.mu", usage = "Dirichlet smoothing parameter value for query-likelihood.", forbids={"-bm25"})
+    @Option(name = "-qld.mu", usage = "Dirichlet smoothing parameter value for query-likelihood.", forbids = {
+        "-bm25" })
     public float ql_mu = 1000.0f;
 
     @Option(name = "-rm3", usage = "Flag to use RM3.")
@@ -262,7 +264,7 @@ public class SimpleSearcher implements Closeable {
    *
    * @return analyzed used
    */
-  public Analyzer getAnalyzer(){
+  public Analyzer getAnalyzer() {
     return this.analyzer;
   }
 
@@ -320,7 +322,8 @@ public class SimpleSearcher implements Closeable {
       this.analyzer = new CJKAnalyzer();
     } else if (language.equals("sw") || language.equals("te")) {
       this.analyzer = new WhitespaceAnalyzer();
-      // For Mr.TyDi: sw and te do not have custom Lucene analyzers, so just use whitespace analyzer.
+      // For Mr.TyDi: sw and te do not have custom Lucene analyzers, so just use
+      // whitespace analyzer.
     }
   }
 
@@ -358,8 +361,8 @@ public class SimpleSearcher implements Closeable {
   /**
    * Enables RM3 query expansion with default parameters.
    *
-   * @param fbTerms number of expansion terms
-   * @param fbDocs number of expansion documents
+   * @param fbTerms             number of expansion terms
+   * @param fbDocs              number of expansion documents
    * @param originalQueryWeight weight to assign to the original query
    */
   public void setRM3(int fbTerms, int fbDocs, float originalQueryWeight) {
@@ -369,11 +372,11 @@ public class SimpleSearcher implements Closeable {
   /**
    * Enables RM3 query expansion with default parameters.
    *
-   * @param fbTerms number of expansion terms
-   * @param fbDocs number of expansion documents
+   * @param fbTerms             number of expansion terms
+   * @param fbDocs              number of expansion documents
    * @param originalQueryWeight weight to assign to the original query
-   * @param outputQuery flag to print original and expanded queries
-   * @param filterTerms whether to filter terms to be English only
+   * @param outputQuery         flag to print original and expanded queries
+   * @param filterTerms         whether to filter terms to be English only
    */
   public void setRM3(int fbTerms, int fbDocs, float originalQueryWeight, boolean outputQuery, boolean filterTerms) {
     useRM3 = true;
@@ -399,22 +402,24 @@ public class SimpleSearcher implements Closeable {
     SearchArgs defaults = new SearchArgs();
     setRocchio(Integer.parseInt(defaults.rocchio_topFbTerms[0]), Integer.parseInt(defaults.rocchio_topFbDocs[0]),
         Integer.parseInt(defaults.rocchio_bottomFbTerms[0]), Integer.parseInt(defaults.rocchio_bottomFbDocs[0]),
-        Float.parseFloat(defaults.rocchio_alpha[0]), Float.parseFloat(defaults.rocchio_beta[0]), Float.parseFloat(defaults.rocchio_gamma[0]), false, false);
+        Float.parseFloat(defaults.rocchio_alpha[0]), Float.parseFloat(defaults.rocchio_beta[0]),
+        Float.parseFloat(defaults.rocchio_gamma[0]), false, false);
   }
 
   /**
    * Enables Rocchio query expansion with default parameters.
    *
-   * @param topFbTerms number of relevant expansion terms
-   * @param topFbDocs number of relevant expansion documents
+   * @param topFbTerms    number of relevant expansion terms
+   * @param topFbDocs     number of relevant expansion documents
    * @param bottomFbTerms number of nonrelevant expansion terms
-   * @param bottomFbDocs number of nonrelevant expansion documents
-   * @param alpha weight to assign to the original query
-   * @param beta weight to assign to the relevant document vectors
-   * @param gamma weight to assign to the nonrelevant document vectors
-   * @param outputQuery flag to print original and expanded queries
+   * @param bottomFbDocs  number of nonrelevant expansion documents
+   * @param alpha         weight to assign to the original query
+   * @param beta          weight to assign to the relevant document vectors
+   * @param gamma         weight to assign to the nonrelevant document vectors
+   * @param outputQuery   flag to print original and expanded queries
    */
-  public void setRocchio(int topFbTerms, int topFbDocs, int bottomFbTerms, int bottomFbDocs, float alpha, float beta, float gamma, boolean outputQuery, boolean useNegative) {
+  public void setRocchio(int topFbTerms, int topFbDocs, int bottomFbTerms, int bottomFbDocs, float alpha, float beta,
+      float gamma, boolean outputQuery, boolean useNegative) {
     useRocchio = true;
     cascade = new RerankerCascade("rocchio");
     cascade.add(new RocchioReranker(this.analyzer, IndexArgs.CONTENTS,
@@ -423,7 +428,8 @@ public class SimpleSearcher implements Closeable {
   }
 
   /**
-   * Specifies use of query likelihood with Dirichlet smoothing as the scoring function.
+   * Specifies use of query likelihood with Dirichlet smoothing as the scoring
+   * function.
    *
    * @param mu mu smoothing parameter
    */
@@ -439,7 +445,7 @@ public class SimpleSearcher implements Closeable {
    * Specifies use of BM25 as the scoring function.
    *
    * @param k1 k1 parameter
-   * @param b b parameter
+   * @param b  b parameter
    */
   public void setBM25(float k1, float b) {
     this.similarity = new BM25Similarity(k1, b);
@@ -463,15 +469,15 @@ public class SimpleSearcher implements Closeable {
    *
    * @return the number of documents in the index
    */
-   public int getTotalNumDocuments(){
-     // Create an IndexSearch only once. Note that the object is thread safe.
-     if (searcher == null) {
-       searcher = new IndexSearcher(reader);
-       searcher.setSimilarity(similarity);
-     }
+  public int getTotalNumDocuments() {
+    // Create an IndexSearch only once. Note that the object is thread safe.
+    if (searcher == null) {
+      searcher = new IndexSearcher(reader);
+      searcher.setSimilarity(similarity);
+    }
 
-     return searcher.getIndexReader().maxDoc();
-   }
+    return searcher.getIndexReader().maxDoc();
+  }
 
   /**
    * Closes this searcher.
@@ -490,8 +496,8 @@ public class SimpleSearcher implements Closeable {
    * Searches the collection using multiple threads.
    *
    * @param queries list of queries
-   * @param qids list of unique query ids
-   * @param k number of hits
+   * @param qids    list of unique query ids
+   * @param k       number of hits
    * @param threads number of threads
    * @return a map of query id to search results
    */
@@ -503,50 +509,126 @@ public class SimpleSearcher implements Closeable {
   /**
    * Searches the collection using multiple threads.
    *
-   * @param generator the method for generating queries
    * @param queries list of queries
-   * @param qids list of unique query ids
-   * @param k number of hits
+   * @param qids    list of unique query ids
+   * @param k       number of hits
    * @param threads number of threads
    * @return a map of query id to search results
    */
-  public Map<String, Result[]> batchSearch(QueryGenerator generator, List<String> queries, List<String> qids, int k, int threads) {
+  public Map<String, Result[]> batchSearchWithQueries(List<Query> queries, List<String> qids, int k, int threads) {
+    // Create the IndexSearcher here, if needed. We do it here because if we leave
+    // the creation to the search
+    // method, we might end up with a race condition as multiple threads try to
+    // concurrently create the IndexSearcher.
+    if (searcher == null) {
+      searcher = new IndexSearcher(reader);
+      searcher.setSimilarity(similarity);
+    }
+
+    ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(threads);
+    ConcurrentHashMap<String, Result[]> results = new ConcurrentHashMap<>();
+
+    long startTime = System.nanoTime();
+    AtomicLong index = new AtomicLong();
+    int queryCnt = queries.size();
+    for (int q = 0; q < queryCnt; ++q) {
+      Query query = queries.get(q);
+      String qid = qids.get(q);
+      executor.execute(() -> {
+        try {
+          results.put(qid, search(query, k));
+        } catch (IOException e) {
+          throw new CompletionException(e);
+        }
+        // Logging to track query latency.
+        // Note that this is potentially noisy because it might interfere with tqdm on
+        // the Python side; logging
+        // every 500 queries seems like a reasonable comprise between offering helpful
+        // info and not being too noisy.
+        Long lineNumber = index.incrementAndGet();
+        if (lineNumber % 500 == 0) {
+          double timePerQuery = (double) (System.nanoTime() - startTime) / (lineNumber + 1) / 1e9;
+          LOG.info(String.format("Retrieving query " + lineNumber + " (%.3f s/query)", timePerQuery));
+        }
+      });
+    }
+
+    executor.shutdown();
+
+    try {
+      // Wait for existing tasks to terminate
+      while (!executor.awaitTermination(1, TimeUnit.MINUTES)) {
+        LOG.info(String.format("%.2f percent completed",
+            (double) executor.getCompletedTaskCount() / queries.size() * 100.0d));
+      }
+    } catch (InterruptedException ie) {
+      // (Re-)Cancel if current thread also interrupted
+      executor.shutdownNow();
+      // Preserve interrupt status
+      Thread.currentThread().interrupt();
+    }
+
+    if (queryCnt != executor.getCompletedTaskCount()) {
+      throw new RuntimeException("queryCount = " + queryCnt +
+          " is not equal to completedTaskCount =  " + executor.getCompletedTaskCount());
+    }
+
+    return results;
+  }
+
+  /**
+   * Searches the collection using multiple threads.
+   *
+   * @param generator the method for generating queries
+   * @param queries   list of queries
+   * @param qids      list of unique query ids
+   * @param k         number of hits
+   * @param threads   number of threads
+   * @return a map of query id to search results
+   */
+  public Map<String, Result[]> batchSearch(QueryGenerator generator, List<String> queries, List<String> qids, int k,
+      int threads) {
     return batchSearchFields(generator, queries, qids, k, threads, new HashMap<>());
   }
 
   /**
-   * Searches the provided fields weighted by their boosts, using multiple threads.
+   * Searches the provided fields weighted by their boosts, using multiple
+   * threads.
    * Batch version of {@link #searchFields(String, Map, int)}.
    *
    * @param queries list of queries
-   * @param qids list of unique query ids
-   * @param k number of hits
+   * @param qids    list of unique query ids
+   * @param k       number of hits
    * @param threads number of threads
-   * @param fields map of fields to search with weights
+   * @param fields  map of fields to search with weights
    * @return a map of query id to search results
    */
   public Map<String, Result[]> batchSearchFields(List<String> queries, List<String> qids, int k, int threads,
-                                                 Map<String, Float> fields) {
+      Map<String, Float> fields) {
     QueryGenerator generator = new BagOfWordsQueryGenerator();
     return batchSearchFields(generator, queries, qids, k, threads, fields);
   }
 
   /**
-   * Searches the provided fields weighted by their boosts, using multiple threads.
+   * Searches the provided fields weighted by their boosts, using multiple
+   * threads.
    * Batch version of {@link #searchFields(String, Map, int)}.
    *
    * @param generator the method for generating queries
-   * @param queries list of queries
-   * @param qids list of unique query ids
-   * @param k number of hits
-   * @param threads number of threads
-   * @param fields map of fields to search with weights
+   * @param queries   list of queries
+   * @param qids      list of unique query ids
+   * @param k         number of hits
+   * @param threads   number of threads
+   * @param fields    map of fields to search with weights
    * @return a map of query id to search results
    */
-  public Map<String, Result[]> batchSearchFields(QueryGenerator generator, List<String> queries, List<String> qids, int k, int threads,
-                                                 Map<String, Float> fields) {
-    // Create the IndexSearcher here, if needed. We do it here because if we leave the creation to the search
-    // method, we might end up with a race condition as multiple threads try to concurrently create the IndexSearcher.
+  public Map<String, Result[]> batchSearchFields(QueryGenerator generator, List<String> queries, List<String> qids,
+      int k, int threads,
+      Map<String, Float> fields) {
+    // Create the IndexSearcher here, if needed. We do it here because if we leave
+    // the creation to the search
+    // method, we might end up with a race condition as multiple threads try to
+    // concurrently create the IndexSearcher.
     if (searcher == null) {
       searcher = new IndexSearcher(reader);
       searcher.setSimilarity(similarity);
@@ -572,8 +654,10 @@ public class SimpleSearcher implements Closeable {
           throw new CompletionException(e);
         }
         // Logging to track query latency.
-        // Note that this is potentially noisy because it might interfere with tqdm on the Python side; logging
-        // every 500 queries seems like a reasonable comprise between offering helpful info and not being too noisy.
+        // Note that this is potentially noisy because it might interfere with tqdm on
+        // the Python side; logging
+        // every 500 queries seems like a reasonable comprise between offering helpful
+        // info and not being too noisy.
         Long lineNumber = index.incrementAndGet();
         if (lineNumber % 500 == 0) {
           double timePerQuery = (double) (System.nanoTime() - startTime) / (lineNumber + 1) / 1e9;
@@ -588,7 +672,7 @@ public class SimpleSearcher implements Closeable {
       // Wait for existing tasks to terminate
       while (!executor.awaitTermination(1, TimeUnit.MINUTES)) {
         LOG.info(String.format("%.2f percent completed",
-                (double) executor.getCompletedTaskCount() / queries.size() * 100.0d));
+            (double) executor.getCompletedTaskCount() / queries.size() * 100.0d));
       }
     } catch (InterruptedException ie) {
       // (Re-)Cancel if current thread also interrupted
@@ -599,7 +683,7 @@ public class SimpleSearcher implements Closeable {
 
     if (queryCnt != executor.getCompletedTaskCount()) {
       throw new RuntimeException("queryCount = " + queryCnt +
-              " is not equal to completedTaskCount =  " + executor.getCompletedTaskCount());
+          " is not equal to completedTaskCount =  " + executor.getCompletedTaskCount());
     }
 
     return results;
@@ -635,7 +719,7 @@ public class SimpleSearcher implements Closeable {
    * Searches the collection with a pre-constructed Lucene {@link Query}.
    *
    * @param query Lucene query
-   * @param k number of hits
+   * @param k     number of hits
    * @return array of search results
    * @throws IOException if error encountered during search
    */
@@ -647,8 +731,8 @@ public class SimpleSearcher implements Closeable {
    * Searches the collection with a specified {@link QueryGenerator}.
    *
    * @param generator the method for generating queries
-   * @param q query
-   * @param k number of hits
+   * @param q         query
+   * @param k         number of hits
    * @return array of search results
    * @throws IOException if error encountered during search
    */
@@ -674,7 +758,7 @@ public class SimpleSearcher implements Closeable {
     RerankerContext context;
     rs = searcher.search(query, useRM3 ? searchArgs.rerankcutoff : k, BREAK_SCORE_TIES_BY_DOCID, true);
     context = new RerankerContext<>(searcher, null, query, null,
-          queryString, queryTokens, null, searchArgs);
+        queryString, queryTokens, null, searchArgs);
 
     ScoredDocuments hits = cascade.run(ScoredDocuments.fromTopDocs(rs, searcher), context);
 
@@ -699,9 +783,9 @@ public class SimpleSearcher implements Closeable {
   /**
    * Searches the provided fields weighted by their boosts.
    *
-   * @param q query
+   * @param q      query
    * @param fields map of fields to search with weights
-   * @param k number of hits
+   * @param k      number of hits
    * @return array of search results
    * @throws IOException if error encountered during search
    */
@@ -715,13 +799,14 @@ public class SimpleSearcher implements Closeable {
    * Searches the provided fields weighted by their boosts.
    *
    * @param generator the method for generating queries
-   * @param q query
-   * @param fields map of fields to search with weights
-   * @param k number of hits
+   * @param q         query
+   * @param fields    map of fields to search with weights
+   * @param k         number of hits
    * @return array of search results
    * @throws IOException if error encountered during search
    */
-  public Result[] searchFields(QueryGenerator generator, String q, Map<String, Float> fields, int k) throws IOException {
+  public Result[] searchFields(QueryGenerator generator, String q, Map<String, Float> fields, int k)
+      throws IOException {
     IndexSearcher searcher = new IndexSearcher(reader);
     searcher.setSimilarity(similarity);
 
@@ -733,7 +818,8 @@ public class SimpleSearcher implements Closeable {
 
   /**
    * Fetches the Lucene {@link Document} based on an internal Lucene docid.
-   * The method is named to be consistent with Lucene's {@link IndexReader#document(int)}, contra Java's standard
+   * The method is named to be consistent with Lucene's
+   * {@link IndexReader#document(int)}, contra Java's standard
    * method naming conventions.
    *
    * @param ldocid internal Lucene docid
@@ -750,7 +836,8 @@ public class SimpleSearcher implements Closeable {
 
   /**
    * Returns the Lucene {@link Document} based on a collection docid.
-   * The method is named to be consistent with Lucene's {@link IndexReader#document(int)}, contra Java's standard
+   * The method is named to be consistent with Lucene's
+   * {@link IndexReader#document(int)}, contra Java's standard
    * method naming conventions.
    *
    * @param docid collection docid
@@ -771,12 +858,13 @@ public class SimpleSearcher implements Closeable {
     ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(threads);
     ConcurrentHashMap<String, Document> results = new ConcurrentHashMap<>();
 
-    for (String docid: docids) {
+    for (String docid : docids) {
       executor.execute(() -> {
         try {
           Document result = IndexReaderUtils.document(reader, docid);
           results.put(docid, result);
-        } catch (Exception e){}
+        } catch (Exception e) {
+        }
       });
     }
 
@@ -786,7 +874,7 @@ public class SimpleSearcher implements Closeable {
       // Wait for existing tasks to terminate
       while (!executor.awaitTermination(1, TimeUnit.MINUTES)) {
         LOG.info(String.format("%.2f percent completed",
-                (double) executor.getCompletedTaskCount() / docids.size() * 100.0d));
+            (double) executor.getCompletedTaskCount() / docids.size() * 100.0d));
       }
     } catch (InterruptedException ie) {
       // (Re-)Cancel if current thread also interrupted
@@ -799,14 +887,17 @@ public class SimpleSearcher implements Closeable {
   }
 
   /**
-   * Fetches the Lucene {@link Document} based on some field other than its unique collection docid.
+   * Fetches the Lucene {@link Document} based on some field other than its unique
+   * collection docid.
    * For example, scientific articles might have DOIs.
-   * The method is named to be consistent with Lucene's {@link IndexReader#document(int)}, contra Java's standard
+   * The method is named to be consistent with Lucene's
+   * {@link IndexReader#document(int)}, contra Java's standard
    * method naming conventions.
    *
    * @param field field
-   * @param id unique id
-   * @return corresponding Lucene {@link Document} based on the value of a specific field
+   * @param id    unique id
+   * @return corresponding Lucene {@link Document} based on the value of a
+   *         specific field
    */
   public Document documentByField(String field, String id) {
     return IndexReaderUtils.documentByField(reader, field, id);
@@ -814,7 +905,8 @@ public class SimpleSearcher implements Closeable {
 
   /**
    * Returns the "contents" field of a document based on an internal Lucene docid.
-   * The method is named to be consistent with Lucene's {@link IndexReader#document(int)}, contra Java's standard
+   * The method is named to be consistent with Lucene's
+   * {@link IndexReader#document(int)}, contra Java's standard
    * method naming conventions.
    *
    * @param ldocid internal Lucene docid
@@ -831,7 +923,8 @@ public class SimpleSearcher implements Closeable {
 
   /**
    * Returns the "contents" field of a document based on a collection docid.
-   * The method is named to be consistent with Lucene's {@link IndexReader#document(int)}, contra Java's standard
+   * The method is named to be consistent with Lucene's
+   * {@link IndexReader#document(int)}, contra Java's standard
    * method naming conventions.
    *
    * @param docid collection docid
@@ -843,7 +936,8 @@ public class SimpleSearcher implements Closeable {
 
   /**
    * Returns the "raw" field of a document based on an internal Lucene docid.
-   * The method is named to be consistent with Lucene's {@link IndexReader#document(int)}, contra Java's standard
+   * The method is named to be consistent with Lucene's
+   * {@link IndexReader#document(int)}, contra Java's standard
    * method naming conventions.
    *
    * @param ldocid internal Lucene docid
@@ -860,7 +954,8 @@ public class SimpleSearcher implements Closeable {
 
   /**
    * Returns the "raw" field of a document based on a collection docid.
-   * The method is named to be consistent with Lucene's {@link IndexReader#document(int)}, contra Java's standard
+   * The method is named to be consistent with Lucene's
+   * {@link IndexReader#document(int)}, contra Java's standard
    * method naming conventions.
    *
    * @param docid collection docid
@@ -870,13 +965,19 @@ public class SimpleSearcher implements Closeable {
     return IndexReaderUtils.documentRaw(reader, docid);
   }
 
-  // Note that this class is primarily meant to be used by automated regression scripts, not humans!
-  // tl;dr - Do not use this class for running experiments. Use SearchCollection instead!
+  // Note that this class is primarily meant to be used by automated regression
+  // scripts, not humans!
+  // tl;dr - Do not use this class for running experiments. Use SearchCollection
+  // instead!
   //
-  // SimpleSearcher is the main class that exposes search functionality for Pyserini (in Python).
-  // As such, it has a different code path than SearchCollection, the preferred entry point for running experiments
-  // from Java. The main method here exposes only barebone options, primarily designed to verify that results from
-  // SimpleSearcher are *exactly* the same as SearchCollection (e.g., via automated regression scripts).
+  // SimpleSearcher is the main class that exposes search functionality for
+  // Pyserini (in Python).
+  // As such, it has a different code path than SearchCollection, the preferred
+  // entry point for running experiments
+  // from Java. The main method here exposes only barebone options, primarily
+  // designed to verify that results from
+  // SimpleSearcher are *exactly* the same as SearchCollection (e.g., via
+  // automated regression scripts).
   public static void main(String[] args) throws Exception {
     Args searchArgs = new Args();
     CmdLineParser parser = new CmdLineParser(searchArgs, ParserProperties.defaults().withUsageWidth(100));
@@ -898,11 +999,12 @@ public class SimpleSearcher implements Closeable {
     PrintWriter out = new PrintWriter(Files.newBufferedWriter(Paths.get(searchArgs.output), StandardCharsets.US_ASCII));
     List<String> argsAsList = Arrays.asList(args);
 
-    // Test a separate code path, where we specify BM25 explicitly, which is different from not specifying it at all.
+    // Test a separate code path, where we specify BM25 explicitly, which is
+    // different from not specifying it at all.
     if (argsAsList.contains("-bm25")) {
       LOG.info("Testing code path of explicitly setting BM25.");
       searcher.setBM25(searchArgs.bm25_k1, searchArgs.bm25_b);
-    } else if (searchArgs.useQL){
+    } else if (searchArgs.useQL) {
       LOG.info("Testing code path of explicitly setting QL.");
       searcher.setQLD(searchArgs.ql_mu);
     }
@@ -919,10 +1021,12 @@ public class SimpleSearcher implements Closeable {
     } else if (searchArgs.useRocchio) {
       if (argsAsList.contains("-rocchio.topFbTerms") || argsAsList.contains("-rocchio.topFbDocs") ||
           argsAsList.contains("-rocchio.bottomFbTerms") || argsAsList.contains("-rocchio.bottomFbDocs") ||
-          argsAsList.contains("-rocchio.alpha") || argsAsList.contains("-rocchio.beta") || argsAsList.contains("-rocchio.gamma")) {
+          argsAsList.contains("-rocchio.alpha") || argsAsList.contains("-rocchio.beta")
+          || argsAsList.contains("-rocchio.gamma")) {
         LOG.info("Testing code path of explicitly setting Rocchio parameters.");
-        searcher.setRocchio(searchArgs.rocchio_topFbTerms, searchArgs.rocchio_topFbDocs, searchArgs.rocchio_bottomFbTerms, searchArgs.rocchio_bottomFbDocs, 
-        searchArgs.rocchio_alpha, searchArgs.rocchio_beta, searchArgs.rocchio_gamma, false, false);
+        searcher.setRocchio(searchArgs.rocchio_topFbTerms, searchArgs.rocchio_topFbDocs,
+            searchArgs.rocchio_bottomFbTerms, searchArgs.rocchio_bottomFbDocs,
+            searchArgs.rocchio_alpha, searchArgs.rocchio_beta, searchArgs.rocchio_gamma, false, false);
       } else {
         LOG.info("Testing code path of default Rocchio parameters.");
         searcher.setRocchio();
